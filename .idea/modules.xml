@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">       # root and attribute
+  <component name="ProjectModuleManager">       #tag and attribute
+    <modules>       #tgag
+      <module fileurl="file://$PROJECT_DIR$/.idea/pyez.iml" filepath="$PROJECT_DIR$/.idea/pyez.iml" />        #tag and attribute
+    </modules>
+  </component>
+</project>
