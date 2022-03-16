@@ -1,0 +1,18 @@
+system {
+    time-zone America/Los_Angeles;
+    name-server {
+    {% for name_server in name_servers %}
+        {{name_server}};
+    {% endfor %}
+    }
+    ntp {
+    {% for ntp_server in ntp_servers %}
+        server {{ntp_server}};
+    {% endfor %}
+    }
+    syslog {
+        host {{syslog_server}} {
+            any any;
+        }
+    }
+}
