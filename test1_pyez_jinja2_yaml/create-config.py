@@ -3,22 +3,29 @@ from jnpr.junos.utils.config import Config
 import yaml
 from pprint import pprint
 
-dev = Device(host='172.19.195.47', user='lab', password='Lab@123', gather_facts=False)
+dev = Device(host='172.19.195.37', user='lab', password='Lab@123', gather_facts=False)
 dev.open()
 
 data = yaml.load(open('configuration.yml'), Loader=yaml.SafeLoader)
 pprint(data)
-cu = Config(dev)
 
-cu.load(template_path='config-template.j2', template_vars=data, format='text')
-cu.pdiff()
 
-if cu.commit_check():
+#cu = Config(dev, mode='exclusive')
+with Config(dev, mode='exclusive') as cu:
+   cu.load(template_path='config-template.j2', template_vars=data, format='text')
+   cu.pdiff()
    cu.commit()
-else:
-   cu.rollback()
-
 dev.close()
+
+# cu.load(template_path='config-template.j2', template_vars=data, format='text')
+# cu.pdiff()
+# cu.commit()
+# if cu.commit_check():
+#    cu.commit()
+# else:
+#    cu.rollback()
+
+#dev.close()
 
 
 

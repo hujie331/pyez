@@ -11,7 +11,8 @@ pprint(data)
 cu = Config(dev)
 
 cu.load(template_path='protocol_temp.j2', template_vars=data, format='text')
-cu.pdiff()
+if cu.pdiff():
+   cu.commit()
 
 if cu.commit_check():
    cu.commit()

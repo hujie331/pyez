@@ -1,0 +1,26 @@
+[
+    {
+        "site name": "SJCA",
+        "device role": "Spare Switch",
+        "hostname": "spsw03",
+        "ip address": "172.19.195.47"
+    },
+    {
+        "site name": "SJCA",
+        "device role": "Spare Switch",
+        "hostname": "spsw04",
+        "ip address": "172.19.195.37"
+    },
+    {
+        "site name": "SJCA",
+        "device role": "Spare Switch",
+        "hostname": "spsw05",
+        "ip address": "172.19.195.38"
+    },
+    {
+        "site name": "SJCA",
+        "device role": "Spare Switch",
+        "hostname": "spsw06",
+        "ip address": "172.19.195.39"
+    }
+]
