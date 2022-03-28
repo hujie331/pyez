@@ -16,15 +16,15 @@ def print_one_by_one(text):
         sys.stdout.flush()
         time.sleep(0.01)
 
-def set_cfg():
+def delete_cfg():
     with Config(device_connection, mode='exclusive') as device_config:
         print('*' * 80)
         print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
-        print_one_by_one('set system ntp server 172.31.24.57\nset system name-server 172.31.24.53\nset system syslog '
-                         'host 10.126.63.40 any any\n')
-        device_config.load('set system ntp server 172.31.24.57', format='set')
-        device_config.load('set system name-server 172.31.24.53', format='set')
-        device_config.load('set system syslog host 10.126.63.40 any any', format='set')
+        print_one_by_one('delete system ntp server 172.31.24.57\ndelete system name-server 172.31.24.53\ndelete '
+                         'system syslog host 10.126.63.40 any any\n')
+        device_config.load('delete system ntp server 172.31.24.57', format='set')
+        device_config.load('delete system name-server 172.31.24.53', format='set')
+        device_config.load('delete system syslog host 10.126.63.40 any any', format='set')
         print('*' * 80)
         print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
         device_config.pdiff()
@@ -35,7 +35,6 @@ def set_cfg():
         print()
         print()
     device_connection.close()
-
 
 def get_credentials():
     username = input('Username(Please input your AD credentials): ')
@@ -57,6 +56,6 @@ for device in devices:
     host_name = device["hostname"]
     host_ip = device["ip address"]
     device_connection = Device(host=host_ip, user=username, password=password).open()
-    set_cfg()
+    delete_cfg()
 
 print_one_by_one(f'The configurations for the devices located at {site_name} have been updated successfully!\n\n')
