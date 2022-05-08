@@ -74,7 +74,4 @@ for device in devices:
     print('*' * 80)
     print()
     dev.close()
-
-
-
 print_one_by_one(f'The configurations for the devices located at {site_name} have been updated successfully!\n\n')
