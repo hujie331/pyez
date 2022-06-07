@@ -53,7 +53,8 @@ def set_cfg():
         print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
         device_config.pdiff()
         print('*' * 80)
-        print_one_by_one(f'committing......\n')
+        pause = input("press any key to commit the changes, or press 'ctrl + C' to exit: \n")
+        print_one_by_one(f'committing {host_name} ({device_role}) located at {site_name}......\n')
         device_config.commit()
         print_one_by_one('commit succeeded')
         print()
@@ -67,7 +68,8 @@ def get_credentials():
     return username, password
 
 os.system('clear')
-
+sitename = input('which site you want to apply the changes to? \n')
+print()
 uservlanname = input('what is the user vlan name? \n')
 print()
 usrvlanid = input('what is the user vlan id? \n')
@@ -105,5 +107,6 @@ for device in devices:
     radius_secret = "802.1x-juniper-radius-secret"
     device_connection = Device(host=host_ip, user=username, password=password).open()
     set_cfg()
+
 
 print_one_by_one(f'The dot1x configurations for the devices located at {site_name} have been updated successfully!\n\n')
