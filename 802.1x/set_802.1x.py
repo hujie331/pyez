@@ -2,6 +2,7 @@ import json
 import sys
 import time
 import os
+import keyboard
 from getpass import getpass
 
 from jnpr.junos import Device
@@ -53,10 +54,22 @@ def set_cfg():
         print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
         device_config.pdiff()
         print('*' * 80)
-        pause = input("press any key to commit the changes, or press 'ctrl + C' to exit: \n")
-        print_one_by_one(f'committing {host_name} ({device_role}) located at {site_name}......\n')
-        device_config.commit()
-        print_one_by_one('commit succeeded')
+        pause = input("press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit: \n").lower()
+        while True:
+            if pause == 'y':
+                print_one_by_one(f'committing {host_name} ({device_role}) located at {site_name}......\n')
+                device_config.commit()
+                print_one_by_one('commit succeeded')
+                break
+            elif pause == 'n':
+                print("\nyou pressed N, so logging into next device...")
+                break
+            elif pause == 'q':
+                print("\nyou pressed Q, so exit...")
+                sys.exit(0)
+            else:
+                print('you input a wrong letter, skipping this device (no changes committed) and moving to the next one')
+                break
         print()
         print()
     device_connection.close()
