@@ -57,7 +57,7 @@ def set_cfg():
         pause = input("press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit: \n").lower()
         while True:
             if pause == 'y':
-                print_one_by_one(f'committing {host_name} ({device_role}) located at {site_name}......\n')
+                print_one_by_one(f'you pressed Y, so committing {host_name} ({device_role}) located at {site_name}......\n')
                 device_config.commit()
                 print_one_by_one('commit succeeded')
                 break
@@ -68,7 +68,7 @@ def set_cfg():
                 print("\nyou pressed Q, so exit...")
                 sys.exit(0)
             else:
-                print('you input a wrong letter, skipping this device (no changes committed) and moving to the next one')
+                print('you input a wrong letter, skipping this device (no changes committed) and moving to the next one...')
                 break
         print()
         print()
