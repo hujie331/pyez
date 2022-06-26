@@ -8,7 +8,6 @@ from getpass import getpass
 from jnpr.junos import Device
 from jnpr.junos.utils.config import Config
 
-
 def print_one_by_one(text):
     sys.stdout.write("\r " + " " * 60 + "\r")
     sys.stdout.flush()
@@ -120,6 +119,5 @@ for device in devices:
     radius_secret = "802.1x-juniper-radius-secret"
     device_connection = Device(host=host_ip, user=username, password=password).open()
     set_cfg()
-
 
 print_one_by_one(f'The dot1x configurations for the devices located at {site_name} have been updated successfully!\n\n')
