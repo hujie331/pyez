@@ -73,7 +73,6 @@ def set_cfg():
         print()
     device_connection.close()
 
-
 def get_credentials():
     username = input('Username(Please input your AD credentials): ')
     password = getpass()
