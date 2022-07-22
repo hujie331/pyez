@@ -1,0 +1,13 @@
+---
+user_vlan_name: v0105_user-net
+
+user_vlan_id: 105
+
+dev_vlan_name: v0135_development
+
+dev_vlan_id: 135
+
+guest_wired_vlan_name: v0110_guest
+
+local_site_pps_vip: 10.125.64.26
+

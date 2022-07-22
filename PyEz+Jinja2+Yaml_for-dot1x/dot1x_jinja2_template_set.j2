@@ -24,11 +24,11 @@ set protocols dot1x authenticator interface dot1x-range server-fail permit
 
 #configure radius server and profile. X.X.X.X refers to local site's PPS VIP interface. 10.50.81.24 is SJCA PPS VIP interface. Radius server secret in 1pass:
 set access radius-server {{item.local_site_pps_vip}} accounting-port 1813
-set access radius-server {{item.local_site_pps_vip}} secret {{item.radius_secret}}
+set access radius-server {{item.local_site_pps_vip}} secret "$9$KlMWX74oJH.Pg4mfzFCAWLx-s4UDk5T3Hq9Ap0RErevLxd2gJik.O1-wYgUD.P5T39cSreWLcSX7dw2g"
 set access radius-server {{item.local_site_pps_vip}} timeout 5
 set access radius-server {{item.local_site_pps_vip}} retry 2
 set access radius-server 10.50.81.24 accounting-port 1813
-set access radius-server 10.50.81.24 secret {{item.radius_secret}}
+set access radius-server 10.50.81.24 secret "$9$KlMWX74oJH.Pg4mfzFCAWLx-s4UDk5T3Hq9Ap0RErevLxd2gJik.O1-wYgUD.P5T39cSreWLcSX7dw2g"
 set access radius-server 10.50.81.24 timeout 5
 set access radius-server 10.50.81.24 retry 2
 set access profile nac-clients authentication-order radius

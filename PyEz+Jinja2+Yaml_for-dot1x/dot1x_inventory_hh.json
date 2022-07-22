@@ -1,0 +1,26 @@
+[
+    {
+        "site name": "Howard Hughes",
+        "device role": "Access Switch",
+        "hostname": "access01.b1f10.corp.la01",
+        "ip address": "172.19.228.27"
+    },
+    {
+        "site name": "Howard Hughes",
+        "device role": "Access Switch",
+        "hostname": "access02.b1f10.corp.la01",
+        "ip address": "172.19.228.28"
+    },
+    {
+        "site name": "Howard Hughes",
+        "device role": "Access Switch",
+        "hostname": "access03.b1f10.corp.la01",
+        "ip address": "172.19.228.29"
+    },
+    {
+        "site name": "Howard Hughes",
+        "device role": "Access Switch",
+        "hostname": "access04.b1f10.corp.la01",
+        "ip address": "172.19.228.30"
+    }
+]
