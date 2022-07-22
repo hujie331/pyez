@@ -1,6 +1,7 @@
 from jnpr.junos import Device
 from jnpr.junos.utils.config import Config
-import yaml
+import
+# from jinja2 import Template
 from pprint import pprint
 
 dev = Device(host='172.19.195.37', user='lab', password='Lab@123', gather_facts=False)
@@ -12,7 +13,7 @@ pprint(data)
 
 #cu = Config(dev, mode='exclusive')
 with Config(dev, mode='exclusive') as cu:
-   cu.load(template_path='config-template.j2', template_vars=data, format='text')
+   cu.load(template_path='config-template.j2', template_vars=data, format='text')    # .load has built-in render method
    cu.pdiff()
    cu.commit()
 dev.close()
