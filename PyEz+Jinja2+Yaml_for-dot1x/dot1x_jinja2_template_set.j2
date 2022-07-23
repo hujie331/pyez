@@ -1,40 +1,40 @@
 
-# to make a fake interface to join dot1x-range
+{# to make a fake interface to join dot1x-range #}
 set interfaces et-0/0/1 disable
 set interfaces et-0/0/1 unit 0 family ethernet-switching
 
 set interfaces interface-range dot1x-range member et-0/0/1
 set interfaces interface-range dot1x-range disable
 
-#Enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for now.
-set vlans {{item.user_vlan_name}} vlan-id {{item.user_vlan_id}} forwarding-options dhcp-security
-set vlans {{item.dev_vlan_name}} vlan-id {{item.dev_vlan_id}} forwarding-options dhcp-security
-# set vlans v0105_user-net vlan-id 105 forwarding-options dhcp-security
-# set vlans v0135_development vlan-id 135 forwarding-options dhcp-security
+{# Enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for now. #}
+set vlans {{user_vlan_name}} vlan-id {{user_vlan_id}} forwarding-options dhcp-security
+set vlans {{dev_vlan_name}} vlan-id {{dev_vlan_id}} forwarding-options dhcp-security
+{# set vlans v0105_user-net vlan-id 105 forwarding-options dhcp-security #}
+{# set vlans v0135_development vlan-id 135 forwarding-options dhcp-security #}
 
-#set dot1x protocol. Server-reject-vlan to use guest wired vlan.
+{# set dot1x protocol. Server-reject-vlan to use guest wired vlan. #}
 set protocols dot1x authenticator authentication-profile-name nac-clients
 set protocols dot1x authenticator interface dot1x-range supplicant multiple
 set protocols dot1x authenticator interface dot1x-range transmit-period 3
 set protocols dot1x authenticator interface dot1x-range mac-radius
 set protocols dot1x authenticator interface dot1x-range reauthentication 3600
-set protocols dot1x authenticator interface dot1x-range server-reject-vlan {{item.guest_wired_vlan_name}}
-# set protocols dot1x authenticator interface dot1x-range server-reject-vlan v0110_guest
+set protocols dot1x authenticator interface dot1x-range server-reject-vlan {{guest_wired_vlan_name}}
+{# set protocols dot1x authenticator interface dot1x-range server-reject-vlan v0110_guest #}
 set protocols dot1x authenticator interface dot1x-range server-fail permit
 
-#configure radius server and profile. X.X.X.X refers to local site's PPS VIP interface. 10.50.81.24 is SJCA PPS VIP interface. Radius server secret in 1pass:
-set access radius-server {{item.local_site_pps_vip}} accounting-port 1813
-set access radius-server {{item.local_site_pps_vip}} secret "$9$KlMWX74oJH.Pg4mfzFCAWLx-s4UDk5T3Hq9Ap0RErevLxd2gJik.O1-wYgUD.P5T39cSreWLcSX7dw2g"
-set access radius-server {{item.local_site_pps_vip}} timeout 5
-set access radius-server {{item.local_site_pps_vip}} retry 2
+{# configure radius server and profile. X.X.X.X refers to local site's PPS VIP interface. 10.50.81.24 is SJCA PPS VIP interface. Radius server secret in 1pass #}
+set access radius-server {{local_site_pps_vip}} accounting-port 1813
+set access radius-server {{local_site_pps_vip}} secret "$9$KlMWX74oJH.Pg4mfzFCAWLx-s4UDk5T3Hq9Ap0RErevLxd2gJik.O1-wYgUD.P5T39cSreWLcSX7dw2g"
+set access radius-server {{local_site_pps_vip}} timeout 5
+set access radius-server {{local_site_pps_vip}} retry 2
 set access radius-server 10.50.81.24 accounting-port 1813
 set access radius-server 10.50.81.24 secret "$9$KlMWX74oJH.Pg4mfzFCAWLx-s4UDk5T3Hq9Ap0RErevLxd2gJik.O1-wYgUD.P5T39cSreWLcSX7dw2g"
 set access radius-server 10.50.81.24 timeout 5
 set access radius-server 10.50.81.24 retry 2
 set access profile nac-clients authentication-order radius
-set access profile nac-clients radius authentication-server {{item.local_site_pps_vip}}
+set access profile nac-clients radius authentication-server {{local_site_pps_vip}}
 set access profile nac-clients radius authentication-server 10.50.81.24
-set access profile nac-clients radius accounting-server {{item.local_site_pps_vip}}
+set access profile nac-clients radius accounting-server {{local_site_pps_vip}}
 set access profile nac-clients radius accounting-server 10.50.81.24
 set access profile nac-clients accounting order radius
 set access profile nac-clients accounting coa-immediate-update

@@ -1,6 +1,6 @@
 from jnpr.junos import Device
 from jnpr.junos.utils.config import Config
-import
+import yaml
 # from jinja2 import Template
 from pprint import pprint
 
