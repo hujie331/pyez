@@ -76,16 +76,16 @@ vars = yaml.load(open(vars_file), Loader=yaml.SafeLoader)
 with open(inventory_file) as dev_file:
     devices = json.load(dev_file)  # convert json to dict
 
-pprint(devices)
-
-
 for device in devices:
 
     site_name = device["site name"]
     device_role = device["device role"]
     host_name = device["hostname"]
     host_ip = device["ip address"]
-
+    print_one_by_one(f'f.At {site_choice}, we need to deploy dot1x to the following devices: ')
+    print("*" * 80)
+    pprint(devices)
+    print("*" * 80)
     dev = Device(host=host_ip, user=username, password=password, gather_facts=False).open()
     dev.timeout = 300
     # device_config = Config(dev, mode='exclusive')
