@@ -76,21 +76,23 @@ vars = yaml.load(open(vars_file), Loader=yaml.SafeLoader)
 with open(inventory_file) as dev_file:
     devices = json.load(dev_file)  # convert json to dict
 
+    print_one_by_one(f'We need to deploy dot1x to the following devices: \n')
+    print("*" * 80)
+    pprint(devices)
+    print("*" * 80)
 for device in devices:
 
     site_name = device["site name"]
     device_role = device["device role"]
     host_name = device["hostname"]
     host_ip = device["ip address"]
-    print_one_by_one(f'f.At {site_choice}, we need to deploy dot1x to the following devices: ')
-    print("*" * 80)
-    pprint(devices)
-    print("*" * 80)
+
+
     dev = Device(host=host_ip, user=username, password=password, gather_facts=False).open()
     dev.timeout = 300
+
     # device_config = Config(dev, mode='exclusive')
     with Config(dev, mode='exclusive') as device_config:    # only when using "with... as...", exclusive mode can work!
-        print('*' * 80)
         print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
         print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
                          'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
@@ -122,12 +124,12 @@ for device in devices:
 
                 elif pause == 'q':
                     print("\nyou pressed Q, so rollback the CHGs and exit...")
-                    device_config.rollback()
+                    # device_config.rollback()
                     sys.exit(0)
                 else:
                     print(
                         'you input a wrong letter, skipping this device (no CHGs committed) and moving to the next one...')
-                    device_config.rollback()
+                    # device_config.rollback()
                     break
         else:
             print_one_by_one("commit unsuccessful, rollback the CHGs and moving to the next device...")
