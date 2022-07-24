@@ -9,10 +9,10 @@ interfaces {
             family ethernet-switching;
         }
     }
-
+}
 access {
     radius-server {
-        7.7.7.7 {
+        {{local_site_pps_vip}} {
             accounting-port 1813;
             secret "$9$6kQN/0B1RhyevtpM8L7Y2qmPTF/uORlK8CtK8X7sYfTz39AuORhclfTA0BIle4aZUHqfT3AtOZU/tuOcSYgo";
             timeout 5;
@@ -28,8 +28,8 @@ access {
     profile nac-clients {
         authentication-order radius;
         radius {
-            authentication-server [ 7.7.7.7 10.50.81.24 ];
-            accounting-server [ 7.7.7.7 10.50.81.24 ];
+            authentication-server [ {{local_site_pps_vip}} 10.50.81.24 ];
+            accounting-server [ {{local_site_pps_vip}} 10.50.81.24 ];
         }
         accounting {
             order radius;
@@ -50,23 +50,24 @@ protocols {
                     transmit-period 3;
                     mac-radius;
                     reauthentication 3600;
-                    server-reject-vlan v0110_guest;
+                    server-reject-vlan {{guest_wired_vlan_name}};
                     server-fail permit;
                 }
             }
         }
     }
-
+}
 vlans {
-    v0105_user-net {
-        vlan-id 105;
+    {{user_vlan_name}} {
+        vlan-id {{user_vlan_id}};
         forwarding-options {
             dhcp-security;
         }
     }
-    v0135_development {
-        vlan-id 135;
+    {{dev_vlan_name}} {
+        vlan-id {{dev_vlan_id}};
         forwarding-options {
             dhcp-security;
         }
     }
+}
