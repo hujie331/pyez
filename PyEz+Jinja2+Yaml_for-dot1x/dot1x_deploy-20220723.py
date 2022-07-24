@@ -76,6 +76,9 @@ vars = yaml.load(open(vars_file), Loader=yaml.SafeLoader)
 with open(inventory_file) as dev_file:
     devices = json.load(dev_file)  # convert json to dict
 
+pprint(devices)
+
+
 for device in devices:
 
     site_name = device["site name"]
@@ -84,50 +87,54 @@ for device in devices:
     host_ip = device["ip address"]
 
     dev = Device(host=host_ip, user=username, password=password, gather_facts=False).open()
-    device_config = Config(dev, mode='exclusive')
+    dev.timeout = 300
+    # device_config = Config(dev, mode='exclusive')
+    with Config(dev, mode='exclusive') as device_config:    # only when using "with... as...", exclusive mode can work!
+        print('*' * 80)
+        print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
+        print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
+                         'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
+                         'guest wired vlan\nconfigure radius server and profile\n')
+        device_config.load(template_path=template_file, template_vars=vars, format='text')
+        print('*' * 80)
+        print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
+        device_config.pdiff()
+        print('*' * 80)
+        print_one_by_one("running commit_check...")
 
-    print('*' * 80)
-    print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
-    print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
-                     'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
-                     'guest wired vlan\nconfigure radius server and profile\n')
-    device_config.load(template_path=template_file, template_vars=vars, format='text')
-    print('*' * 80)
-    print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
-    device_config.pdiff()
-    print('*' * 80)
-    if device_config.commit_check():
-        pause = input("commit check was successful\n"
-               "press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit: \n").lower()
-        while True:
-            if pause == 'y':
-                print_one_by_one(
-                    f'you pressed Y, so committing {host_name} ({device_role}) located at {site_name}......\n')
-                device_config.commit()
-                print_one_by_one('commit succeeded')
-                break
+        if device_config.commit_check(timeout=240):
+            # dev.timeout = 240
+            print_one_by_one("commit check was successful\n"
+                   "press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit\n")
+            pause = input("Your input: ").lower()
+            while True:
+                if pause == 'y':
+                    print_one_by_one(
+                        f'you pressed Y, so committing {host_name} ({device_role}) located at {site_name}......\n')
+                    device_config.commit(timeout=240)
+                    print_one_by_one('commit succeeded')
+                    break
 
-            elif pause == 'n':
-                print("\nyou pressed N, so rollback the CHGs, disconnecting from device, logging into next device...")
-                device_config.rollback()
-                break
+                elif pause == 'n':
+                    print("\nyou pressed N, so rollback the CHGs, disconnecting from device, logging into next device...")
+                    # device_config.rollback()
+                    break
 
-            elif pause == 'q':
-                print("\nyou pressed Q, so rollback the CHGs and exit...")
-                device_config.rollback()
-                sys.exit(0)
-            else:
-                print(
-                    'you input a wrong letter, skipping this device (no CHGs committed) and moving to the next one...')
-                device_config.rollback()
-                break
-        # print_one_by_one("commit check was successful, performing commit now")
-        # commit_status = device_config.commit()
-        # print_one_by_one("disconnecting from device")
-        dev.close()
-        print()
-        print()
-    else:
-        print_one_by_one("commit unsuccessful, rollback the CHGs and moving to the next device...")
+                elif pause == 'q':
+                    print("\nyou pressed Q, so rollback the CHGs and exit...")
+                    device_config.rollback()
+                    sys.exit(0)
+                else:
+                    print(
+                        'you input a wrong letter, skipping this device (no CHGs committed) and moving to the next one...')
+                    device_config.rollback()
+                    break
+        else:
+            print_one_by_one("commit unsuccessful, rollback the CHGs and moving to the next device...")
+    dev.close()
+    print()
+    print()
+        # else:
+        #     print_one_by_one("commit unsuccessful, rollback the CHGs and moving to the next device...")
 
 print_one_by_one(f'The dot1x configurations for the devices located at {site_name} have been updated successfully!\n\n')
