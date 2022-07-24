@@ -44,46 +44,11 @@ def get_credentials():
     password = getpass()
     return username, password
 
-def set_cfg():
-    dev = Device(host=host_ip, user=username, password=password, gather_facts=False).open()
-    with Config(dev, mode='exclusive') as device_config:
-        print('*' * 80)
-        print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
-        print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
-                         'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
-                         'guest wired vlan\nconfigure radius server and profile\n')
-        device_config.load(template_path=template_file, template_vars=vars, format='text')
-        print('*' * 80)
-        print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
-        device_config.pdiff()
-        print('*' * 80)
-        pause = input("press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit: \n").lower()
-        while True:
-            if pause == 'y':
-                print_one_by_one(f'you pressed Y, so committing {host_name} ({device_role}) located at {site_name}......\n')
-                device_config.commit()
-                print_one_by_one('commit succeeded')
-                break
-
-            elif pause == 'n':
-                print("\nyou pressed N, so logging into next device...")
-                break
-
-            elif pause == 'q':
-                print("\nyou pressed Q, so exit...")
-                sys.exit(0)
-            else:
-                print('you input a wrong letter, skipping this device (no changes committed) and moving to the next one...')
-                break
-        print()
-        print()
-    dev.close()
-
 os.system('clear')
 username, password = get_credentials()
 
 while True:
-    site_choice = input("""\nPlease select teh site where you would like to deploy 802.1x: \n
+    site_choice = input("""\nPlease select the site where you would like to deploy 802.1x: \n
        1:  SJCA_spare
        2:  Howard Hughes
        3:  San Francisco\n       
@@ -112,27 +77,28 @@ with open(inventory_file) as dev_file:
     devices = json.load(dev_file)  # convert json to dict
 
 for device in devices:
+
     site_name = device["site name"]
     device_role = device["device role"]
     host_name = device["hostname"]
     host_ip = device["ip address"]
 
-
     dev = Device(host=host_ip, user=username, password=password, gather_facts=False).open()
-    with Config(dev, mode='exclusive') as device_config:
-        print('*' * 80)
-        print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
-        print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
-                         'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
-                         'guest wired vlan\nconfigure radius server and profile\n')
-        device_config.load(template_path=template_file, template_vars=vars, format='text')
-        print('*' * 80)
-        print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
-        device_config.pdiff()
-        print('*' * 80)
-        
-        pause = input(
-            "press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit: \n").lower()
+    device_config = Config(dev, mode='exclusive')
+
+    print('*' * 80)
+    print_one_by_one(f'Loading configuration commands on {host_name} ({device_role}) located at {site_name}:\n')
+    print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
+                     'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
+                     'guest wired vlan\nconfigure radius server and profile\n')
+    device_config.load(template_path=template_file, template_vars=vars, format='text')
+    print('*' * 80)
+    print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
+    device_config.pdiff()
+    print('*' * 80)
+    if device_config.commit_check():
+        pause = input("commit check was successful\n"
+               "press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit: \n").lower()
         while True:
             if pause == 'y':
                 print_one_by_one(
@@ -142,19 +108,26 @@ for device in devices:
                 break
 
             elif pause == 'n':
-                print("\nyou pressed N, so logging into next device...")
+                print("\nyou pressed N, so rollback the CHGs, disconnecting from device, logging into next device...")
+                device_config.rollback()
                 break
 
             elif pause == 'q':
-                print("\nyou pressed Q, so exit...")
+                print("\nyou pressed Q, so rollback the CHGs and exit...")
+                device_config.rollback()
                 sys.exit(0)
             else:
                 print(
-                    'you input a wrong letter, skipping this device (no changes committed) and moving to the next one...')
+                    'you input a wrong letter, skipping this device (no CHGs committed) and moving to the next one...')
+                device_config.rollback()
                 break
+        # print_one_by_one("commit check was successful, performing commit now")
+        # commit_status = device_config.commit()
+        # print_one_by_one("disconnecting from device")
+        dev.close()
         print()
         print()
-    dev.close()
-
+    else:
+        print_one_by_one("commit unsuccessful, rollback the CHGs and moving to the next device...")
 
 print_one_by_one(f'The dot1x configurations for the devices located at {site_name} have been updated successfully!\n\n')
