@@ -88,7 +88,7 @@ for device in devices:
     host_ip = device["ip address"]
 
 
-    dev = Device(host=host_ip, user=username, password=password, gather_facts=False).open()
+    dev = Device(host=host_ip, user=username, password=password, port=22, gather_facts=False).open()
     dev.timeout = 300
 
     # device_config = Config(dev, mode='exclusive')
