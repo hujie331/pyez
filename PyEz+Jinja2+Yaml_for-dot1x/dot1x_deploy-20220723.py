@@ -11,6 +11,7 @@ import time
 import os
 import keyboard
 from getpass import getpass
+from collections import OrderedDict
 
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)  # IOError: Broken pipe
 signal.signal(signal.SIGINT, signal.SIG_DFL)  # KeyboardInterrupt: Ctrl-C
@@ -75,12 +76,13 @@ template_file = "/home/jhu/PycharmProjects/pyez/PyEz+Jinja2+Yaml_for-dot1x/dot1x
 vars = yaml.load(open(vars_file), Loader=yaml.SafeLoader)
 
 with open(inventory_file) as dev_file:
-    devices = json.load(dev_file)  # convert json to dict
+    devices = json.load(dev_file, object_pairs_hook=OrderedDict)  # convert json to dict, keep the original order
 
     print_one_by_one(f'We need to deploy dot1x to the following devices: \n')
     print("*" * 80)
     pprint(devices)
     print("*" * 80)
+    pause_global = input("Press 'Enter' to continue...")
 for device in devices:
 
     site_name = device["site name"]
@@ -98,17 +100,19 @@ for device in devices:
         print_one_by_one('enable DHCP-security option to enable dhcp snooping. only for User/Dev wired networks for '
                          'now\nset interface range for dot1x ports\nset dot1x protocol. Server-reject-vlan to use '
                          'guest wired vlan\nconfigure radius server and profile\n')
+
         device_config.load(template_path=template_file, template_vars=vars, format='text')
         print('*' * 80)
         print_one_by_one(f'Comparing the candidate configuration to a previously committed configuration:\n')
         device_config.pdiff()
         print('*' * 80)
-        print_one_by_one("running commit_check...")
+
+        print_one_by_one("running commit_check...\n")
         try:
             device_config.commit_check(timeout=240)
             # dev.timeout = 240
             print_one_by_one("commit check was successful\n"
-                   "press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit\n")
+                   "press 'Y' to commit the CHGs, or press 'N' to rollback the CHGs, or press 'Q' to quit\n")
             pause = input("Your input: ").lower()
             while True:
                 if pause == 'y':
@@ -135,6 +139,10 @@ for device in devices:
         except(jnpr.junos.exception.CommitError, jnpr.junos.exception.ConfigLoadError) as err:
             print()
             print(err)
+            print_one_by_one('*' * 80)
+            print()
+            pause_except = input(
+                "commit_check failed, press 'Enter' to skip this device(rollback the CHGs) and moving to the next one... ")
 
     dev.close()
     print()
