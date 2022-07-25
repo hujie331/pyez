@@ -1,3 +1,4 @@
+import jnpr.junos.exception
 from jnpr.junos import Device
 from jnpr.junos.utils.config import Config
 import yaml
@@ -103,8 +104,8 @@ for device in devices:
         device_config.pdiff()
         print('*' * 80)
         print_one_by_one("running commit_check...")
-
-        if device_config.commit_check(timeout=240):
+        try:
+            device_config.commit_check(timeout=240)
             # dev.timeout = 240
             print_one_by_one("commit check was successful\n"
                    "press 'Y' to commit the changes, or press 'N' to ignore the changes, or press 'Q' to exit\n")
@@ -131,8 +132,10 @@ for device in devices:
                         'you input a wrong letter, skipping this device (no CHGs committed) and moving to the next one...')
                     # device_config.rollback()
                     break
-        else:
-            print_one_by_one("commit unsuccessful, rollback the CHGs and moving to the next device...")
+        except(jnpr.junos.exception.CommitError, jnpr.junos.exception.ConfigLoadError) as err:
+            print()
+            print(err)
+
     dev.close()
     print()
     print()
