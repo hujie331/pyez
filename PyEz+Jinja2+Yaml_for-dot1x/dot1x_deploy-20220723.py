@@ -82,7 +82,7 @@ with open(inventory_file) as dev_file:
     print("*" * 80)
     pprint(devices)
     print("*" * 80)
-    pause_global = input("Press 'Enter' to continue...")
+    pause_global = input("Press 'Enter' to continue, or press 'Ctrl + C' to quit...")
 for device in devices:
 
     site_name = device["site name"]
